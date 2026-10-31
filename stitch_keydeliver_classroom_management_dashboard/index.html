@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeyDeliver Web App v2.5 Demo Video</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #070D1E;
+      color: #F1F5F9;
+    }
+
+    .bg-card {
+      background-color: #0F172A;
+      border-color: #1E293B;
+    }
+
+    .bg-card-active {
+      background-color: #1A0F24;
+      border-color: #4C1D95;
+    }
+
+    /* Animasi Efek Loading Screen */
+    #loadingScreen {
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .progress-bar-fill {
+      animation: fillProgress 1.8s ease-in-out forwards;
+    }
+
+    @keyframes fillProgress {
+      0% {
+        width: 0%;
+      }
+
+      50% {
+        width: 60%;
+      }
+
+      100% {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans min-h-screen pb-12">
+
+  <!-- ================= VISUAL LOADING SCREEN ================= -->
+  <div id="loadingScreen" class="fixed inset-0 bg-[#070D1E] z-50 flex flex-col items-center justify-center p-6">
+    <div class="text-center space-y-6 max-w-sm w-full">
+      <!-- Icon Kunci Bersinar -->
+      <div class="relative inline-block">
+        <div
+          class="w-20 h-20 bg-blue-600/20 rounded-3xl flex items-center justify-center border border-blue-500/30 shadow-2xl shadow-blue-500/50 mx-auto animate-bounce">
+          <i class="fa-solid fa-key text-blue-400 text-3xl"></i>
+        </div>
+        <span class="absolute -bottom-1 -right-1 flex h-4 w-4">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-500"></span>
+        </span>
+      </div>
+
+      <!-- Judul & Status -->
+      <div>
+        <h1 class="text-2xl font-extrabold text-white tracking-wider">KeyDeliver</h1>
+        <p class="text-xs text-slate-400 mt-1">Sistem Peminjaman 300 Kunci Kelas & Lab</p>
+      </div>
+
+      <!-- Progress Bar Animasi -->
+      <div class="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-500 h-full rounded-full progress-bar-fill"></div>
+      </div>
+
+      <!-- Teks Status Memuat -->
+      <div class="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium">
+        <i class="fa-solid fa-circle-notch animate-spin text-blue-400"></i>
+        <span id="loadingStatusText">Memuat 300 data kabinet kunci...</span>
+      </div>
+    </div>
+  </div>
+  <!-- ================= END LOADING SCREEN ================= -->
+
+  <!-- HEADER DASHBOARD -->
+  <header class="border-b border-slate-800 bg-[#0B132B] px-6 py-4 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-600/30">
+          <i class="fa-solid fa-key text-white text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-2xl tracking-tight text-white">KeyDeliver</h1>
+            <span
+              class="bg-blue-900/60 text-blue-300 border border-blue-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">v2.5
+              Hybrid</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Sistem Peminjaman 300 Kunci Kelas & Lab • UIN Malang</p>
+        </div>
+      </div>
+
+      <div id="userBadge"
+        class="flex items-center gap-2 bg-slate-900 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs">
+        <i class="fa-solid fa-circle-user text-blue-400 text-base"></i>
+        <div>
+          <p class="font-bold text-white leading-tight" id="userNameDisplay">Mahasiswa UIN</p>
+          <p class="text-[10px] text-slate-400" id="userStatusDisplay">Status: Bebas Pinjam</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 mt-6 space-y-6">
+
+    <!-- 4 KARTU METRIK STATISTIK -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-card border p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL KUNCI</p>
+          <h3 class="text-3xl font-extrabold text-white mt-1">300</h3>
+          <p class="text-[11px] text-slate-400 mt-1">Kapasitas Gedung</p>
+        </div>
+        <div class="bg-blue-950/60 p-3.5 rounded-xl text-blue-400 border border-blue-900/40">
+          <i class="fa-solid fa-layer-group text-2xl"></i>
+        </div>
+      </div>
+
+      <div class="bg-card border p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">STATUS KOSONG</p>
+          <h3 id="statKosong" class="text-3xl font-extrabold text-emerald-400 mt-1">297</h3>
+          <p class="text-[11px] text-emerald-400/90 font-medium mt-1">Siap Dipinjam</p>
+        </div>
+        <div class="bg-emerald-950/60 p-3.5 rounded-xl text-emerald-400 border border-emerald-900/40">
+          <i class="fa-solid fa-circle-check text-2xl"></i>
+        </div>
+      </div>
+
+      <div class="bg-card border p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">SEDANG TERPAKAI</p>
+          <h3 id="statTerpakai" class="text-3xl font-extrabold text-rose-500 mt-1">3</h3>
+          <p class="text-[11px] text-rose-400/90 font-medium mt-1">Sedang Perkuliahan</p>
+        </div>
+        <div class="bg-rose-950/60 p-3.5 rounded-xl text-rose-400 border border-rose-900/40">
+          <i class="fa-solid fa-door-closed text-2xl"></i>
+        </div>
+      </div>
+
+      <div class="bg-card border p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">LAYANAN DIANTER</p>
+          <h3 id="statDianter" class="text-3xl font-extrabold text-amber-400 mt-1">1</h3>
+          <p class="text-[11px] text-amber-400/80 font-medium mt-1">Pengantaran Petugas</p>
+        </div>
+        <div class="bg-amber-950/60 p-3.5 rounded-xl text-amber-400 border border-amber-900/40">
+          <i class="fa-solid fa-motorcycle text-2xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER SESI AKTIF KULIAH -->
+    <div id="activeLoanBanner"
+      class="hidden bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-slate-900 border border-purple-500/50 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+        <div class="space-y-1">
+          <span
+            class="bg-rose-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+            🔴 Sesi Kuliah Anda Sedang Berlangsung
+          </span>
+          <h3 id="activeLoanTitle" class="text-xl font-extrabold text-white">Meminjam Kunci</h3>
+          <p id="activeLoanDetail" class="text-xs text-purple-200"></p>
+          <div id="activeLoanInstruction"
+            class="mt-2 text-xs bg-black/30 p-2.5 rounded-xl border border-white/10 text-amber-300"></div>
+        </div>
+
+        <button onclick="confirmFinishLecture()"
+          class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-base"></i> Kuliah Sudah Selesai (Kembalikan Kunci)
+        </button>
+      </div>
+    </div>
+
+    <!-- SEARCH BAR & TAB FILTER -->
+    <div class="bg-card border p-4 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-center">
+      <div class="relative w-full md:w-96">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="searchInput" placeholder="Cari nomor kunci (1-300) / peminjam..."
+          class="w-full bg-[#070D1E] border border-slate-800 text-white text-xs rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-500">
+      </div>
+
+      <div
+        class="flex bg-[#070D1E] p-1.5 rounded-xl border border-slate-800 w-full md:w-auto text-xs font-semibold gap-1">
+        <button onclick="filterStatus('ALL')" id="btnALL"
+          class="flex-1 md:flex-none px-5 py-2 rounded-lg bg-blue-600 text-white shadow-md transition">Semua
+          (300)</button>
+        <button onclick="filterStatus('KOSONG')" id="btnKOSONG"
+          class="flex-1 md:flex-none px-5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Kosong
+        </button>
+        <button onclick="filterStatus('TERPAKAI')" id="btnTERPAKAI"
+          class="flex-1 md:flex-none px-5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span> Terpakai
+        </button>
+      </div>
+    </div>
+
+    <!-- GRID 300 KUNCI -->
+    <div class="flex justify-between items-center pt-2">
+      <h2 class="font-bold text-lg text-white tracking-wide">Katalog Kunci Ruang Kelas (1-300)</h2>
+      <div class="flex items-center gap-3">
+        <button onclick="resetDataDemo()"
+          class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg border border-slate-700">↺
+          Reset Data Demo</button>
+        <span id="showingCount" class="text-xs text-slate-400 font-medium">Menampilkan: 300 dari 300 Kunci</span>
+      </div>
+    </div>
+
+    <div id="keyGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+  </main>
+
+  <!-- MODAL POPUP FORM PEMINJAMAN -->
+  <div id="borrowModal"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-[#0F172A] border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl my-8">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+        <h3 class="font-bold text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-key text-blue-500"></i> Form Peminjaman Kunci
+        </h3>
+        <button onclick="closeBorrowModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="borrowForm" onsubmit="handleBorrowSubmit(event)" class="space-y-4 mt-4">
+        <input type="hidden" id="modalKeyId">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Nomor Kunci / Ruang Kelas</label>
+          <input type="text" id="modalKeyDisplay" readonly
+            class="w-full bg-[#070D1E] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-bold text-blue-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Nama Lengkap Peminjam <span
+              class="text-rose-400">*</span></label>
+          <input type="text" id="inputNama" required placeholder="Masukkan Nama Lengkap"
+            class="w-full bg-[#070D1E] border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">NIM / NIP <span
+              class="text-rose-400">*</span></label>
+          <input type="text" id="inputNIM" required placeholder="Masukkan NIM Mahasiswa"
+            class="w-full bg-[#070D1E] border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Upload e-KTM / Identitas Digital <span
+              class="text-rose-400">*</span></label>
+          <input type="file" id="inputKTM" accept="image/*" required
+            class="w-full bg-[#070D1E] border border-slate-800 text-slate-400 text-xs rounded-xl px-3 py-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">Pilih Opsi Layanan Peminjaman</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              class="border border-slate-800 rounded-xl p-3 bg-[#070D1E] cursor-pointer hover:border-blue-500 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/20">
+              <input type="radio" name="inputMetode" value="Manual" checked onchange="toggleMetodeOptions()"
+                class="sr-only">
+              <p class="font-bold text-xs text-white"><i class="fa-solid fa-person-walking"></i> Manual</p>
+              <p class="text-[10px] text-slate-400 mt-1">Ambil Sendiri di Lt. 1</p>
+            </label>
+
+            <label
+              class="border border-slate-800 rounded-xl p-3 bg-[#070D1E] cursor-pointer hover:border-blue-500 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-950/20">
+              <input type="radio" name="inputMetode" value="Dianter" onchange="toggleMetodeOptions()" class="sr-only">
+              <p class="font-bold text-xs text-white"><i class="fa-solid fa-motorcycle"></i> Dianter</p>
+              <p class="text-[10px] text-slate-400 mt-1">Dibukakan oleh Petugas</p>
+            </label>
+          </div>
+        </div>
+
+        <div id="paymentOptionBox" class="hidden bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+          <label class="block text-xs font-semibold text-amber-400">Metode Pembayaran Layanan Dianter:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label
+              class="flex items-center gap-2 bg-[#070D1E] p-2 rounded-lg border border-slate-800 text-xs text-white cursor-pointer">
+              <input type="radio" name="inputPayment" value="QRIS" checked class="text-blue-600">
+              <i class="fa-solid fa-qrcode text-indigo-400"></i> QRIS (Scan)
+            </label>
+            <label
+              class="flex items-center gap-2 bg-[#070D1E] p-2 rounded-lg border border-slate-800 text-xs text-white cursor-pointer">
+              <input type="radio" name="inputPayment" value="Cash" class="text-blue-600">
+              <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Tunai / Cash
+            </label>
+          </div>
+        </div>
+
+        <div id="manualInstructionBox"
+          class="bg-amber-950/40 border border-amber-600/40 p-3 rounded-xl text-[11px] text-amber-200 space-y-1">
+          <p class="font-bold flex items-center gap-1.5 text-amber-300">
+            <i class="fa-solid fa-triangle-exclamation"></i> Instruksi Ambil Manual:
+          </p>
+          <p>Silakan turun ke **Posko Sekuriti Lantai 1** untuk mengambil kunci fisik.</p>
+          <p class="text-rose-300 font-semibold">⚠️ Kehilangan kunci ditanggung peminjam! Bawa KTM / KTP asli sebagai
+            jaminan.</p>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="closeBorrowModal()"
+            class="flex-1 py-2.5 border border-slate-800 text-slate-400 rounded-xl text-xs font-semibold hover:bg-slate-900">Batal</button>
+          <button type="submit"
+            class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-600/30">Konfirmasi
+            Pinjam</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOGIKA JAVASCRIPT STATE MANAGEMENT & LOADING TIMER -->
+  <script>
+    let keysData = [];
+    let currentFilter = 'ALL';
+    let activeUserLoan = null;
+
+    // Logika Hapus Loading Screen setelah 2 Detik
+    function handleLoadingScreen() {
+      setTimeout(() => {
+        document.getElementById('loadingStatusText').innerText = "Sistem Siap!";
+      }, 1200);
+
+      setTimeout(() => {
+        const screen = document.getElementById('loadingScreen');
+        screen.style.opacity = '0';
+        screen.style.visibility = 'hidden';
+      }, 2000);
+    }
+
+    function initData() {
+      const savedData = localStorage.getItem('keydeliver_keys_demo');
+      if (savedData) {
+        keysData = JSON.parse(savedData);
+      } else {
+        generateSampleData();
+      }
+
+      const savedLoan = localStorage.getItem('keydeliver_active_loan');
+      if (savedLoan) {
+        activeUserLoan = JSON.parse(savedLoan);
+      }
+    }
+
+    function generateSampleData() {
+      keysData = [];
+      for (let i = 1; i <= 300; i++) {
+        keysData.push({
+          id: i,
+          roomName: `Ruang Kelas ${i}`,
+          status: 'KOSONG',
+          borrower: 'Siap Dipinjam',
+          nim: '',
+          method: '',
+          payment: ''
+        });
+      }
+
+      keysData[1] = {
+        id: 2,
+        roomName: 'Ruang Kelas 2',
+        status: 'TERPAKAI',
+        borrower: 'Dosen Pengampu',
+        nim: 'NIP 19850123201012',
+        method: 'Manual',
+        payment: 'Tanpa Biaya'
+      };
+
+      keysData[104] = {
+        id: 105,
+        roomName: 'Ruang Kelas 105',
+        status: 'TERPAKAI',
+        borrower: 'Ahmad Zaki',
+        nim: '2104010012',
+        method: 'Dianter',
+        payment: 'QRIS'
+      };
+
+      keysData[203] = {
+        id: 204,
+        roomName: 'Ruang Kelas 204',
+        status: 'TERPAKAI',
+        borrower: 'Siti Rahma',
+        nim: '2204010045',
+        method: 'Manual',
+        payment: 'Tanpa Biaya'
+      };
+
+      saveToLocalStorage();
+    }
+
+    function resetDataDemo() {
+      if (confirm("Reset seluruh status kunci kembali ke kondisi sampel demo?")) {
+        localStorage.removeItem('keydeliver_keys_demo');
+        localStorage.removeItem('keydeliver_active_loan');
+        activeUserLoan = null;
+        generateSampleData();
+        updateMetrics();
+        renderGrid();
+        renderActiveLoanBanner();
+      }
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('keydeliver_keys_demo', JSON.stringify(keysData));
+      if (activeUserLoan) {
+        localStorage.setItem('keydeliver_active_loan', JSON.stringify(activeUserLoan));
+      } else {
+        localStorage.removeItem('keydeliver_active_loan');
+      }
+    }
+
+    function updateMetrics() {
+      const kosongCount = keysData.filter(k => k.status === 'KOSONG').length;
+      const terpakaiCount = keysData.filter(k => k.status === 'TERPAKAI').length;
+      const dianterCount = keysData.filter(k => k.status === 'TERPAKAI' && k.method === 'Dianter').length;
+
+      document.getElementById('statKosong').innerText = kosongCount;
+      document.getElementById('statTerpakai').innerText = terpakaiCount;
+      document.getElementById('statDianter').innerText = dianterCount;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('keyGrid');
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      let filtered = keysData.filter(k => {
+        const matchSearch = k.id.toString().includes(searchVal) || k.roomName.toLowerCase().includes(searchVal) || k.borrower.toLowerCase().includes(searchVal);
+        const matchStatus = currentFilter === 'ALL' || k.status === currentFilter;
+        return matchSearch && matchStatus;
+      });
+
+      document.getElementById('showingCount').innerText = `Menampilkan: ${filtered.length} dari 300 Kunci`;
+
+      let html = '';
+      filtered.forEach(k => {
+        const isKosong = k.status === 'KOSONG';
+        const formattedId = `#${k.id.toString().padStart(3, '0')}`;
+        const isMyLoan = activeUserLoan && activeUserLoan.id === k.id;
+
+        html += `
+                    <div onclick="handleKeyCardClick(${k.id})" 
+                         class="cursor-pointer border p-3.5 rounded-xl transition duration-200 flex flex-col justify-between h-28 group ${isKosong ? 'bg-card hover:border-blue-500/50' : isMyLoan ? 'bg-purple-950/50 border-purple-500' : 'bg-card-active border-slate-800 opacity-75'}">
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-slate-400">${formattedId}</span>
+                            <span class="w-2 h-2 rounded-full ${isKosong ? 'bg-emerald-400' : 'bg-rose-500 animate-pulse'}"></span>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-sm text-white group-hover:text-blue-400 transition">${k.roomName}</h4>
+                            <p class="text-[11px] ${isKosong ? 'text-emerald-400/80 font-medium' : 'text-rose-400 font-semibold truncate'} mt-0.5">
+                                ${!isKosong ? '👤 ' : ''}${k.borrower}
+                            </p>
+                        </div>
+                    </div>
+                `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function handleKeyCardClick(id) {
+      const key = keysData.find(k => k.id === id);
+
+      if (key.status === 'TERPAKAI') {
+        if (activeUserLoan && activeUserLoan.id === id) {
+          confirmFinishLecture();
+        } else {
+          alert(`🚫 RUANGAN SEDANG DIPAKAI PERKULIAHAN!\n\nKunci #${id} (${key.roomName}) saat ini sedang digunakan oleh:\n• Nama: ${key.borrower}\n• NIM/NIP: ${key.nim}\n• Metode: ${key.method}\n\nRuangan ini tidak dapat dipinjam sampai perkuliahan selesai.`);
+        }
+        return;
+      }
+
+      if (activeUserLoan) {
+        alert(`⚠️ Anda sedang meminjam Kunci #${activeUserLoan.id} (${activeUserLoan.roomName}). Selesaikan perkuliahan Anda terlebih dahulu sebelum meminjam kelas lain!`);
+        return;
+      }
+
+      openBorrowModal(id);
+    }
+
+    function openBorrowModal(id) {
+      document.getElementById('modalKeyId').value = id;
+      document.getElementById('modalKeyDisplay').value = `#${id.toString().padStart(3, '0')} - Ruang Kelas ${id}`;
+      document.getElementById('borrowModal').classList.remove('hidden');
+    }
+
+    function closeBorrowModal() {
+      document.getElementById('borrowModal').classList.add('hidden');
+      document.getElementById('borrowForm').reset();
+      toggleMetodeOptions();
+    }
+
+    function toggleMetodeOptions() {
+      const metode = document.querySelector('input[name="inputMetode"]:checked').value;
+      const paymentBox = document.getElementById('paymentOptionBox');
+      const manualBox = document.getElementById('manualInstructionBox');
+
+      if (metode === 'Dianter') {
+        paymentBox.classList.remove('hidden');
+        manualBox.classList.add('hidden');
+      } else {
+        paymentBox.classList.add('hidden');
+        manualBox.classList.remove('hidden');
+      }
+    }
+
+    function handleBorrowSubmit(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('modalKeyId').value);
+      const nama = document.getElementById('inputNama').value.trim();
+      const nim = document.getElementById('inputNIM').value.trim();
+      const metode = document.querySelector('input[name="inputMetode"]:checked').value;
+      const payment = metode === 'Dianter' ? document.querySelector('input[name="inputPayment"]:checked').value : 'Tanpa Biaya';
+
+      const key = keysData.find(k => k.id === id);
+      key.status = 'TERPAKAI';
+      key.borrower = nama;
+      key.nim = nim;
+      key.method = metode;
+      key.payment = payment;
+
+      activeUserLoan = key;
+
+      saveToLocalStorage();
+      closeBorrowModal();
+      updateMetrics();
+      renderGrid();
+      renderActiveLoanBanner();
+    }
+
+    function renderActiveLoanBanner() {
+      const banner = document.getElementById('activeLoanBanner');
+      const userStatus = document.getElementById('userStatusDisplay');
+      const userName = document.getElementById('userNameDisplay');
+
+      if (!activeUserLoan) {
+        banner.classList.add('hidden');
+        userStatus.innerText = "Status: Bebas Pinjam";
+        userName.innerText = "Mahasiswa UIN";
+        return;
+      }
+
+      banner.classList.remove('hidden');
+      userName.innerText = activeUserLoan.borrower;
+      userStatus.innerText = `Status: Meminjam Kunci #${activeUserLoan.id}`;
+
+      document.getElementById('activeLoanTitle').innerText = `Meminjam Kunci #${activeUserLoan.id} - ${activeUserLoan.roomName}`;
+      document.getElementById('activeLoanDetail').innerText = `Peminjam: ${activeUserLoan.borrower} (${activeUserLoan.nim}) • Metode: ${activeUserLoan.method} ${activeUserLoan.method === 'Dianter' ? `(${activeUserLoan.payment})` : ''}`;
+
+      const instruction = document.getElementById('activeLoanInstruction');
+      if (activeUserLoan.method === 'Manual') {
+        instruction.innerHTML = `<i class="fa-solid fa-person-walking"></i> <b>Instruksi Ambil Manual:</b> Silakan ke Posko Lt. 1 untuk mengambil kunci fisik. <u>Jangan lupa jaminan KTM/KTP asli.</u> Kehilangan kunci ditanggung peminjam!`;
+      } else {
+        instruction.innerHTML = `<i class="fa-solid fa-motorcycle"></i> <b>Instruksi Dianter:</b> Petugas sedang menuju ke ${activeUserLoan.roomName} untuk membukakan pintu kelas. Pembayaran via <b>${activeUserLoan.payment}</b>.`;
+      }
+    }
+
+    function confirmFinishLecture() {
+      if (!activeUserLoan) return;
+
+      if (confirm(`Apakah perkuliahan di ${activeUserLoan.roomName} sudah selesai?\n\nKlik OK untuk mengonfirmasi bahwa kelas telah selesai dan mengembalikan status kunci.`)) {
+        const key = keysData.find(k => k.id === activeUserLoan.id);
+        key.status = 'KOSONG';
+        key.borrower = 'Siap Dipinjam';
+        key.nim = '';
+        key.method = '';
+        key.payment = '';
+
+        activeUserLoan = null;
+
+        saveToLocalStorage();
+        renderActiveLoanBanner();
+        updateMetrics();
+        renderGrid();
+      }
+    }
+
+    function filterStatus(status) {
+      currentFilter = status;
+      ['ALL', 'KOSONG', 'TERPAKAI'].forEach(s => {
+        const btn = document.getElementById(`btn${s}`);
+        if (s === status) {
+          btn.className = "flex-1 md:flex-none px-5 py-2 rounded-lg bg-blue-600 text-white shadow-md transition";
+        } else {
+          btn.className = "flex-1 md:flex-none px-5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5";
+        }
+      });
+      renderGrid();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderGrid);
+
+    window.onload = function () {
+      handleLoadingScreen();
+      initData();
+      updateMetrics();
+      renderGrid();
+      renderActiveLoanBanner();
+    };
+  </script>
+</body>
+
+</html>
